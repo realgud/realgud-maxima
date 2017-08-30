@@ -13,15 +13,15 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-;;  `realgud:lldb' Main interface to lldb via Emacs
+;;  `realgud:maxima' Main interface to maxima via Emacs
 (require 'load-relative)
 (require 'realgud)
-(require-relative-list '("core" "track-mode") "realgud:lldb-")
+(require-relative-list '("core" "track-mode") "realgud:maxima-")
 
 ;; This is needed, or at least the docstring part of it is needed to
 ;; get the customization menu to work in Emacs 24.
-(defgroup realgud:lldb nil
-  "The realgud interface to lldb"
+(defgroup realgud:maxima nil
+  "The realgud interface to maxima"
   :group 'realgud
   :version "24.3")
 
@@ -29,17 +29,17 @@
 ;; User definable variables
 ;;
 
-(defcustom realgud:lldb-command-name
-  "lldb"
+(defcustom realgud:maxima-command-name
+  "maxima"
   "File name for executing the and command options.
 This should be an executable on your path, or an absolute file name."
   :type 'string
-  :group 'realgud:lldb)
+  :group 'realgud:maxima)
 
-(declare-function realgud:lldb-track-mode     'realgud:lldb-track-mode)
-(declare-function realgud-command             'realgud:lldb-core)
-(declare-function realgud:lldb-parse-cmd-args 'realgud:lldb-core)
-(declare-function realgud:lldb-query-cmdline  'realgud:lldb-core)
+(declare-function realgud:maxima-track-mode     'realgud:maxima-track-mode)
+(declare-function realgud-command             'realgud:maxima-core)
+(declare-function realgud:maxima-parse-cmd-args 'realgud:maxima-core)
+(declare-function realgud:maxima-query-cmdline  'realgud:maxima-core)
 (declare-function realgud:run-process         'realgud-core)
 (declare-function realgud:flatten             'realgud-utils)
 (declare-function realgud:remove-ansi-schmutz 'realgud-utils)
@@ -49,8 +49,8 @@ This should be an executable on your path, or an absolute file name."
 ;;
 
 ;;;###autoload
-(defun realgud:lldb (&optional opt-cmd-line no-reset)
-  "Invoke the lldb debugger and start the Emacs user interface.
+(defun realgud:maxima (&optional opt-cmd-line no-reset)
+  "Invoke the maxima debugger and start the Emacs user interface.
 
 OPT-CMD-LINE is treated like a shell string; arguments are
 tokenized by `split-string-and-unquote'.
@@ -64,28 +64,28 @@ marginal icons is reset. See `loc-changes-clear-buffer' to clear
 fringe and marginal icons.
 "
   (interactive)
-  (let* ((cmd-str (or opt-cmd-line (realgud:lldb-query-cmdline "lldb")))
+  (let* ((cmd-str (or opt-cmd-line (realgud:maxima-query-cmdline "maxima")))
 	 (cmd-args (split-string-and-unquote cmd-str))
-	 (parsed-args (realgud:lldb-parse-cmd-args cmd-args))
+	 (parsed-args (realgud:maxima-parse-cmd-args cmd-args))
 	 (script-args (caddr parsed-args))
 	 (script-name (car script-args))
 	 (parsed-cmd-args
 	  (cl-remove-if 'nil (realgud:flatten parsed-args)))
-	 (cmd-buf (realgud:run-process realgud:lldb-command-name
+	 (cmd-buf (realgud:run-process realgud:maxima-command-name
 				       script-name parsed-cmd-args
-				       'realgud:lldb-minibuffer-history
+				       'realgud:maxima-minibuffer-history
 				       nil))
 	 )
     (if cmd-buf
 	(with-current-buffer cmd-buf
-	  (set (make-local-variable 'realgud:lldb-file-remap))
+	  (set (make-local-variable 'realgud:maxima-file-remap))
 	  (realgud:remove-ansi-schmutz)
 	  )
       )
     )
   )
 
-(defalias 'lldb 'realgud:lldb)
+(defalias 'maxima 'realgud:maxima)
 
 (provide-me "realgud-")
 

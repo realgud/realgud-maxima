@@ -1,9 +1,9 @@
-;;; realgud-lldb.el --- realgud front-end to lldb
+;;; realgud-maxima.el --- realgud front-end to maxima
 
 ;; Author: Rocky Bernstein
 ;; Version: 1.0
 ;; Package-Requires: ((realgud "1.4.2") (emacs "24"))
-;; URL: http://github.com/rocky/realgud-lldb
+;; URL: http://github.com/rocky/realgud-maxima
 ;; Compatibility: GNU Emacs 24.x
 
 ;; Copyright (C) 2015, 2016 Free Software Foundation, Inc
@@ -25,7 +25,7 @@
 
 ;;; Commentary:
 
-;; realgud support for the LLVM's debugger lldb
+;; realgud support for the LLVM's debugger maxima
 
 ;;; Code:
 
@@ -35,13 +35,13 @@
 
 (require 'load-relative)
 
-(defgroup realgud-lldb  nil
-  "Realgud interface to lldb"
+(defgroup realgud-maxima  nil
+  "Realgud interface to maxima"
   :group 'realgud
   :version "24.3")
 
-(require-relative-list '( "./lldb/lldb" ) "realgud-")
+(require-relative-list '( "./maxima/maxima" ) "realgud-")
 
 (provide-me)
 
-;;; realgud-lldb.el ends here
+;;; realgud-maxima.el ends here

@@ -4,7 +4,7 @@
 (require 'test-simple)
 (require 'load-relative)
 (require 'realgud)
-(load-file "../lldb/init.el")
+(load-file "../maxima/init.el")
 (load-file "./regexp-helper.el")
 
 (declare-function __FILE__              'load-relative)
@@ -21,7 +21,7 @@
 ; Some setup usually done in setting up the buffer.
 ; We customize this for this debugger.
 ; FIXME: encapsulate this.
-(setq dbg-name "lldb")
+(setq dbg-name "maxima")
 
 (setq loc-pat (gethash "loc" (gethash dbg-name realgud-pat-hash)))
 (setq test-dbgr (make-realgud-cmdbuf-info
@@ -45,7 +45,7 @@
 ;; 			    test-text) "extract line number")
 (note "debugger-backtrace")
 (setq realgud-bt-pat  (gethash "debugger-backtrace"
-			    realgud:gdb-pat-hash))
+			    realgud:maxima-pat-hash))
 (setq test-text
       "#0  main (argc=2, argv=0xbffff564, envp=0xbffff570) at main.c:935
 #1  0xb7e9f4a5 in *__GI___strdup (s=0xbffff760 \"/tmp/remake/remake\") at strdup.c:42
@@ -105,7 +105,8 @@
 
 (note "prompt")
 (set (make-local-variable 'prompt-pat)
-     (gethash "prompt" realgud:gdb-pat-hash))
-(prompt-match "(gdb) ")
+     (gethash "prompt" realgud:maxima-pat-hash))
+(prompt-match "(dbm:1) ")
+(prompt-match "(dbm:33) ")
 
 (end-tests)
