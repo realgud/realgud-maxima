@@ -6,7 +6,7 @@
 ;; URL: http://github.com/rocky/realgud-maxima
 ;; Compatibility: GNU Emacs 24.x
 
-;; Copyright (C) 2015, 2016 Free Software Foundation, Inc
+;; Copyright (C) 2017 Free Software Foundation, Inc
 
 ;; Author: Rocky Bernstein <rocky@gnu.org>
 
