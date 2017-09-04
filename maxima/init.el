@@ -29,8 +29,10 @@ realgud-loc-pat struct")
 
 (declare-function make-realgud-loc "realgud-loc" (a b c d e f))
 
-(defconst realgud:maxima-frame-file-regexp
+(defconst realgud:maxima-frame-file-line-regexp
   (format "\\(.+\\):%s" realgud:regexp-captured-num))
+
+(defconst realgud:maxima-frame-file-regexp "\\(.+\\)")
 
 (defconst realgud:maxima-frame-start-regexp
   "\\(?:^\\|\n\\)")
@@ -39,40 +41,32 @@ realgud-loc-pat struct")
   (format "#%s: "
 	  realgud:regexp-captured-num))
 
-(setf (gethash "loc-callback-fn" realgud:maxima-pat-hash) 'realgud:maxima-loc-fn-callback)
+(setf (gethash "loc-callback-fn" realgud:maxima-pat-hash) nil)
 
 ;; realgud-loc-pat that describes a maxima location generally shown
 ;; before a command prompt.
 ;; For example:
-;; /tmp/foobar.mac:2::
+;; /tmp/foobar.mac:2::
 ;;
 (setf (gethash "loc" realgud:maxima-pat-hash)
       (make-realgud-loc-pat
-       :regexp (format "^\\* thread #%s: .+ at %s, "
-		       realgud:regexp-captured-num realgud:maxima-frame-file-regexp)
-       :file-group 2
-       :line-group 3))
+       :regexp (format "^\\(.+\\):%s::" realgud:regexp-captured-num)
+       :file-group 1
+       :line-group 2))
 
 ;; Top frame number
 (setf (gethash "top-frame-num" realgud:maxima-pat-hash) 0)
 
 ;; realgud-loc-pat that describes a maxima frame generally shown
 ;; before a command prompt or in frame switching commands
-;;  frame #1: 0x00000000004015e2 ctest`main(argc=1, argv=0x00007fffffffd778) + 90 at ctest.c:83
-;; Some versions of maxima give:
-;; #0  main (argc=2, argv=0xbffff564, envp=0xbffff570) at main.c:935
-;; instead
+;; #1: bar(x=2,y=3)(foobar.mac line 9)
 
 (setf (gethash "selected-frame" realgud:maxima-pat-hash)
       (make-realgud-loc-pat
-       :regexp 	(format "^%s.* at %s"
-			realgud:maxima-frame-num-regexp
-			realgud:maxima-frame-file-regexp
-			)
+       :regexp "#\\([0-9]+\\): \\([a-zA-Z_]+\\)(\\(.+\\))(\\(.+\\) line \\([0-9]+\\))"
        :num 1
        :file-group 2
-       :line-group 3)
-      )
+       :line-group 3))
 
 ;; realgud-loc-pat that describes a maxima prompt
 ;; For example:
@@ -88,9 +82,11 @@ realgud-loc-pat struct")
 ;;   Bkpt 0 for foo (in /tmp/foobar.mac line 1)
 (setf (gethash "brkpt-set" realgud:maxima-pat-hash)
       (make-realgud-loc-pat
-       :regexp (format "^Bkpt %s: for .* (in \\(.+\\) line %s"
+       :regexp (format "^\\(?:Bkpt %s for .* (in \\(.+\\) line %s\\))\\|\\(?:Bkpt %s:(\\(.+\\) \\(.+\\))\\)"
 		       realgud:regexp-captured-num
-		       realgud:regexp-captured-num)
+		       realgud:regexp-captured-num
+		       realgud:regexp-captured-num
+		       )
        :num 1
        :file-group 2
        :line-group 3))
@@ -102,29 +98,19 @@ realgud-loc-pat struct")
 
 (setf (gethash "debugger-backtrace" realgud:maxima-pat-hash)
       (make-realgud-loc-pat
-       :regexp 	(concat realgud:maxima-frame-start-regexp
-			realgud:maxima-frame-num-regexp
-			"\\(?:.\\|\\(?:[\n] \\)\\)+[ ]+at "
-			realgud:maxima-frame-file-regexp
-			)
+       :regexp "#\\([0-9]+\\): \\([a-zA-Z_]+\\)(\\(.+\\))(\\(.+\\) line \\([0-9]+\\))"
        :num 1
        :file-group 2
-       :line-group 3)
-      )
+       :line-group 3))
 
 (setf (gethash "font-lock-keywords" realgud:maxima-pat-hash)
       '(
-	;; #2  0x080593ac in main (argc=2, argv=0xbffff5a4, envp=0xbffff5b0)
-	;;    at main.c:952
-	("[ \n]+at \\(.*\\):\\([0-9]+\\)"
-	 (1 realgud-file-name-face)
-	 (2 realgud-line-number-face))
-
-	;; The frame number and first type name, if present.
-	;; E.g. =>#0  Makefile.in at /tmp/Makefile:216
-	;;      ---^
-	( "#\\(?:^\\|\n\\)\\([0-9]+\\)  "
-	 (1 realgud-backtrace-number-face))
+	;; For backtraces, the frame number, function file and line if present.
+	("#\\([0-9]+\\): \\([a-zA-Z_]+\\)(\\(.+\\))(\\(.+\\) line \\([0-9]+\\))"
+	 (1 realgud-backtrace-number-face)
+	 (2 font-lock-function-name-face nil t)     ; t means optional.
+	 (4 font-lock-type-number-face)
+	 (5 font-lock-line-number-face))
 	))
 
 ;;  Prefix used in variable names (e.g. short-key-mode-map) for
@@ -136,6 +122,7 @@ realgud-loc-pat struct")
   the maxima command to use, like 'process continue'")
 
 (setf (gethash "backtrace"   realgud:maxima-command-hash) ":bt")
+(setf (gethash "break"       realgud:maxima-command-hash) "*not-implemented*")
 (setf (gethash "clear"       realgud:maxima-command-hash) "*not-implemented*")
 (setf (gethash "continue"    realgud:maxima-command-hash) ":continue")
 (setf (gethash "delete"      realgud:maxima-command-hash) ":delete %p")

@@ -38,7 +38,7 @@
 (defgroup realgud-maxima  nil
   "Realgud interface to maxima"
   :group 'realgud
-  :version "24.3")
+  :version "24.5")
 
 (require-relative-list '( "./maxima/maxima" ) "realgud-")
 

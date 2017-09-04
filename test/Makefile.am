@@ -1,5 +1,5 @@
 lisp_files = $(wildcard *.el)
-EXTRA_DIST = $(lisp_files)
+EXTRA_DIST = $(lisp_files)  foobar.mac
 lisp_LISP = $(lisp_files)
 include $(top_srcdir)/common.mk
 
