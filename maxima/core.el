@@ -1,4 +1,4 @@
-;; Copyright (C) 2016 Rocky Bernstein
+;; Copyright (C) 2017 Rocky Bernstein
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -84,15 +84,16 @@ ORIG_ARGS should contain a tokenized list of the command line to run.
 We return the a list containing
 * the name of the debugger given (e.g. maxima) and its arguments - a list of strings
 * nil (a placehoder in other routines of this ilk for a debugger
-* the script name and its arguments - list of strings
-* whether the emacs option was given ('--emacs) - a boolean
+* the script name and its arguments - here it will be nil
+* whether the emacs option was given ('--emacs) - here it will be nil
 
 For example for the following input
   (map 'list 'symbol-name
-   '(maxima --tty /dev/pts/1 -cd ~ --emacs ./gcd.py a b))
+   '(maxima --init-mac ~/init.mac -g -p preload.lisp --init-lisp=init.lisp)
 
 we might return:
-   ((\"maxima\" \"--tty\" \"/dev/pts/1\" \"-cd\" \"home/rocky\' \"--emacs\") nil \"(/tmp/gcd.py a b\") 't\")
+   ((\"maxima\" \"--init-mac\" \"/home/rocky/init.mac\" \"-g\" \"-p\" \"--preload.lisp\"
+     \"int-lisp=init.lisp\") nil nil nil)
 
 Note that path elements have been expanded via `expand-file-name'.
 "
@@ -106,8 +107,16 @@ Note that path elements have been expanded via `expand-file-name'.
 	;; One dash is added automatically to the below, so
 	;; a is really -a. maxima doesn't seem to have long
 	;; (--) options.
-	(maxima-two-args '("a" "f" "c" "s" "o" "S" "k" "L"
-			"p" "O"  "K"))
+	(maxima-two-args '("b" "-batch" "-batch-lisp"
+			   "-batch-string"
+			   "-userdir"
+			   "-init"
+			   "-init-mac"
+			   "-init-lisp"
+			   "p" "-preload-lisp"
+			   "s" "-server-port"
+			   "u" "-use-version"
+			   "X" "-lisp-options"))
 	;; maxima doesn't optional 2-arg options.
 	(maxima-opt-two-args '("r"))
 
@@ -138,12 +147,6 @@ Note that path elements have been expanded via `expand-file-name'.
 	(while (and args (not script-name))
 	  (let ((arg (car args)))
 	    (cond
-	     ;; path-argument ooptions
-	     ((member arg '("-cd" ))
-	      (setq arg (pop args))
-	      (nconc debugger-args
-		     (list arg (realgud:expand-file-name-if-exists
-				(pop args)))))
 	     ;; Options with arguments.
 	     ((string-match "^-" arg)
 	      (setq pair (realgud-parse-command-arg
@@ -158,57 +161,14 @@ Note that path elements have been expanded via `expand-file-name'.
 
 (defvar realgud:maxima-command-name)
 
-(defun realgud:maxima-executable (file-name)
-"Return a priority for wehther file-name is likely we can run maxima on"
-  (let ((output (shell-command-to-string (format "file %s" file-name))))
-    (cond
-     ((string-match "ASCII" output) 2)
-     ((string-match "ELF" output) 7)
-     ((string-match "executable" output) 6)
-     ('t 5))))
-
-
 (defun realgud:maxima-suggest-invocation (&optional debugger-name)
-  "Suggest a maxima command invocation. Here is the priority we use:
-* an executable file with the name of the current buffer stripped of its extension
-* any executable file in the current directory with no extension
-* the last invocation in maxima:minibuffer-history
-* any executable in the current directory
+  "Suggest a maxima command invocation.
 When all else fails return the empty string."
-  (let* ((file-list (directory-files default-directory))
-	 (priority 2)
-	 (best-filename nil)
-	 (try-filename (file-name-base (or (buffer-file-name) "maxima"))))
-    (when (member try-filename (directory-files default-directory))
-	(setq best-filename try-filename)
-	(setq priority (+ (realgud:maxima-executable try-filename) 2)))
-
-    ;; FIXME: I think a better test would be to look for
-    ;; c-mode in the buffer that have a corresponding executable
-    (while (and (setq try-filename (car-safe file-list)) (< priority 8))
-      (setq file-list (cdr file-list))
-      (if (and (file-executable-p try-filename)
-	       (not (file-directory-p try-filename)))
-	  (if (equal try-filename (file-name-sans-extension try-filename))
-	      (progn
-		(setq best-filename try-filename)
-		(setq priority (1+ (realgud:maxima-executable best-filename))))
-	    ;; else
-	    (progn
-	      (setq best-filename try-filename)
-	      (setq priority (realgud:maxima-executable best-filename))
-	      ))
-	))
-    (if (< priority 8)
-	(cond
-	 (realgud:maxima-minibuffer-history
-	  (car realgud:maxima-minibuffer-history))
-	 ((equal priority 7)
-	  (concat "maxima " best-filename))
-	 (t "maxima "))
-      ;; else
-      (concat "maxima " best-filename))
-    ))
+  (if debugger-name
+      (format "%s " debugger-name)
+    ;; else
+      "maxima ")
+    )
 
 (defun realgud:maxima-reset ()
   "Maxima cleanup - remove debugger's internal buffers (frame,

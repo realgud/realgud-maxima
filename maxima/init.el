@@ -98,7 +98,7 @@ realgud-loc-pat struct")
 
 (setf (gethash "debugger-backtrace" realgud:maxima-pat-hash)
       (make-realgud-loc-pat
-       :regexp "#\\([0-9]+\\): \\([a-zA-Z_]+\\)(\\(.+\\))(\\(.+\\) line \\([0-9]+\\))"
+       :regexp "#\\([0-9]+\\): \\([a-zA-Z_][a-zA-Z0-9_]*\\)(\\(.+\\))(\\(.+\\) line \\([0-9]+\\))"
        :num 1
        :file-group 4
        :line-group 5))
@@ -106,7 +106,7 @@ realgud-loc-pat struct")
 (setf (gethash "font-lock-keywords" realgud:maxima-pat-hash)
       '(
 	;; For backtraces, the frame number, function file and line if present.
-	("#\\([0-9]+\\): \\([a-zA-Z_]+\\)(\\(.+\\))(\\(.+\\) line \\([0-9]+\\))"
+	("^#\\([0-9]+\\): \\([a-zA-Z_][a-zA-Z0-9_]*\\)(\\(.+\\))(\\(.+\\) line \\([0-9]+\\))$"
 	 (1 realgud-backtrace-number-face)
 	 (2 font-lock-function-name-face nil t)     ; t means optional.
 	 (4 font-lock-type-number-face)

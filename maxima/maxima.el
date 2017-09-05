@@ -1,4 +1,4 @@
-;; Copyright (C) 2016 Rocky Bernstein
+;; Copyright (C) 2017 Rocky Bernstein
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 (defgroup realgud:maxima nil
   "The realgud interface to maxima"
   :group 'realgud
-  :version "24.3")
+  :version "24.5")
 
 ;; -------------------------------------------------------------------
 ;; User definable variables
@@ -76,12 +76,6 @@ fringe and marginal icons.
 				       'realgud:maxima-minibuffer-history
 				       nil))
 	 )
-    (if cmd-buf
-	(with-current-buffer cmd-buf
-	  (set (make-local-variable 'realgud:maxima-file-remap))
-	  (realgud:remove-ansi-schmutz)
-	  )
-      )
     )
   )
 
