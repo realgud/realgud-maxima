@@ -65,8 +65,8 @@ realgud-loc-pat struct")
       (make-realgud-loc-pat
        :regexp "#\\([0-9]+\\): \\([a-zA-Z_]+\\)(\\(.+\\))(\\(.+\\) line \\([0-9]+\\))"
        :num 1
-       :file-group 2
-       :line-group 3))
+       :file-group 4
+       :line-group 5))
 
 ;; realgud-loc-pat that describes a maxima prompt
 ;; For example:
@@ -100,8 +100,8 @@ realgud-loc-pat struct")
       (make-realgud-loc-pat
        :regexp "#\\([0-9]+\\): \\([a-zA-Z_]+\\)(\\(.+\\))(\\(.+\\) line \\([0-9]+\\))"
        :num 1
-       :file-group 2
-       :line-group 3))
+       :file-group 4
+       :line-group 5))
 
 (setf (gethash "font-lock-keywords" realgud:maxima-pat-hash)
       '(
@@ -129,6 +129,7 @@ realgud-loc-pat struct")
 (setf (gethash "delete_all"  realgud:maxima-command-hash) ":delete")
 (setf (gethash "disable"     realgud:maxima-command-hash) ":disable %p")
 (setf (gethash "disable_all" realgud:maxima-command-hash) ":disable")
+(setf (gethash "down"        realgud:maxima-command-hash) "*not-implemented*")
 (setf (gethash "enable"      realgud:maxima-command-hash) ":enable %p")
 (setf (gethash "enable_all"  realgud:maxima-command-hash)  ":enable")
 (setf (gethash "eval"        realgud:maxima-command-hash) ":lisp %s")
@@ -139,6 +140,7 @@ realgud-loc-pat struct")
 (setf (gethash "quit"        realgud:maxima-command-hash) ":quit")
 (setf (gethash "run"         realgud:maxima-command-hash) ":resume")
 (setf (gethash "step"        realgud:maxima-command-hash) ":step")
+(setf (gethash "up"          realgud:maxima-command-hash) "*not-implemented*")
 
 (setf (gethash "maxima" realgud-command-hash) realgud:maxima-command-hash)
 (setf (gethash "maxima" realgud-pat-hash) realgud:maxima-pat-hash)
